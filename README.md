@@ -1,7 +1,7 @@
 # Predicting Violent Hate Crime Classification Using Machine Learning
 This repository contains the data, notebooks, and requirements for analyzing hate crimes in Chicago from 2012 to 2025.
 
-This project is built with **Python 3.13.5**. To ensure all dependencies are installed, a `requirements.txt` file is provided.
+This project is built with Python 3.13.5. To ensure reproducibility, a `requirements.txt` file is provided.
 
 # 1.0 Overview
 This project analyzes hate crimes in Chicago from 2012–2025 to identify spatial patterns and factors associated with violent hate crimes. Using Chicago Police Department open data, the goal is to predict whether a hate crime is violent and to interpret which features drive violence.
