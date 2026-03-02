@@ -94,7 +94,7 @@ Separate exploratory spatial analysis (not included in model training) revealed:
 These findings suggest potential geographic reporting or contextual differences, though spatial covariates were not included in the classifier.
 
 # 5.0 Limitations & Next Steps
-Geography: Analysis is restricted to Chicago, results may differ in other cities.
-Demographics: Socioeconomic and population features were not included. Incorporating ward-level demographics could improve predictive power.
-Bias Reporting: Variability in reporting may affect model accuracy, particularly in affluent vs. marginalized areas.
-Future Work: Expand analysis to other cities, incorporate covariates, and explore temporal trends more deeply.
+- Geography: Analysis is restricted to Chicago, results may differ in other cities.
+- Demographics: Socioeconomic and population features were not included. Incorporating ward-level demographics could improve predictive power.
+- Bias Reporting: Variability in reporting may affect model accuracy, particularly in affluent vs. marginalized areas.
+- Future Work: Expand analysis to other cities, incorporate covariates, and explore temporal trends more deeply.
