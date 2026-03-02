@@ -43,7 +43,7 @@ Evaluation Metrics
 - Confusion matrices
 - Feature importance & partial dependence plots
 
-# 4.0 Model Evaluation
+# 4.0 Model Evaluation & Results
 Model Performance Summary:
 
 | Model               | Accuracy | ROC-AUC |
@@ -91,7 +91,7 @@ Separate exploratory spatial analysis (not included in model training) revealed:
 - Southern Chicago exhibited a higher proportion of violent incidents.
 These findings suggest potential geographic reporting or contextual differences, though spatial covariates were not included in the classifier.
 
-# 6.0 Limitations & Next Steps
+# 5.0 Limitations & Next Steps
 Geography: Analysis is restricted to Chicago, results may differ in other cities.
 Demographics: Socioeconomic and population features were not included. Incorporating ward-level demographics could improve predictive power.
 Bias Reporting: Variability in reporting may affect model accuracy, particularly in affluent vs. marginalized areas.
