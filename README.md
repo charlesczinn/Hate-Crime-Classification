@@ -10,12 +10,14 @@ The project implements:
 This repository includes all code, processed data, and results necessary for reproducibility.
 
 # 2.0 Data
-Source: Chicago Police Department (public hate crime dataset)
-Temporal Coverage: 2012–2025
+Source: Chicago Police Department (public hate crime dataset for 2012–2025)
+
 Unit of Analysis: Individual incident
+
 Outcome Variable: violent_crime (binary)
-    1 = Physical violence (assault, battery, robbery, arson, homicide)
-    0 = Non-violent offense (e.g., vandalism, harassment)
+- 1 = Physical violence (assault, battery, robbery, arson, homicide)
+- 0 = Non-violent offense (e.g., vandalism, harassment)
+
 Violence is operationalized as direct physical harm, consistent with established criminological definitions.
 
 Predictor Variables:
