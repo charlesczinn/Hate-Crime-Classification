@@ -48,8 +48,8 @@ Model Performance Summary:
 
 | Model               | Accuracy | ROC-AUC |
 | ------------------- | -------- | ------- |
-| Logistic Regression | 0.668    | 0.749   |
-| Tuned Random Forest | 0.676    | 0.740   |
+| Logistic Regression | 0.688    | 0.759   |
+| Tuned Random Forest | 0.688    | 0.749   |
 
 - Logistic Regression slightly outperforms Random Forest in ROC-AUC.
 - Both models demonstrate moderate predictive performance for violent hate crimes.
