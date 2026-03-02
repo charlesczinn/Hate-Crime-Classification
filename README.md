@@ -4,12 +4,11 @@ This repository contains the data, notebooks, and requirements for analyzing hat
 This project is built with Python 3.13.5. To ensure reproducibility, a `requirements.txt` file is provided.
 
 # 1.0 Overview
-This project analyzes hate crimes in Chicago from 2012–2025 to identify spatial patterns and factors associated with violent hate crimes. Using Chicago Police Department open data, the goal is to predict whether a hate crime is violent and to interpret which features drive violence.
+This project analyzes hate crimes in Chicago from 2012–2025 to identify factors associated with violent hate crimes. Using Chicago Police Department open data, the goal is to predict whether a hate crime is violent and to interpret which features drive violence.
 The project implements:
 - Logistic Regression (baseline)
 - Random Forest (tuned)
 - Feature importance and partial dependence analysis
-This repository includes all code, processed data, and results necessary for reproducibility.
 
 # 2.0 Data
 Source: Chicago Police Department (public hate crime dataset for 2012–2025)
@@ -29,7 +28,7 @@ Predictor Variables:
 - `DATEOCC`: Date of occurrence (aggregated to season)
 
 # 3.0 Methodology
-Data Cleaning & Feature Engineering
+Feature Engineering
 - Converted `DATEOCC` to a `season` variable (Winter, Spring, Summer, Fall)
 - Encoded categorical variables with pd.get_dummies
 
