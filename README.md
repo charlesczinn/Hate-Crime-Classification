@@ -2,9 +2,12 @@
 A Random Forest and Logistic Regression Comparison
 
 # 1.0 Overview
-This project develops and evaluates supervised machine learning models to classify whether a reported hate crime incident is violent or non-violent. Using hate crime data from the Chicago Police Department (2012–2025), the analysis implements logistic regression and random forest classifiers to assess the predictive utility of categorical incident characteristics.
-The primary objective is to determine: Can structured incident-level features predict whether a hate crime involves physical violence?
-Understanding predictors of violent incidents can help inform analytical approaches to incident risk classification and structured decision-support tools.
+This project analyzes hate crimes in Chicago from 2012–2025 to identify spatial patterns and factors associated with violent hate crimes. Using Chicago Police Department open data, the goal is to predict whether a hate crime is violent and to interpret which features drive violence.
+The project implements:
+- Logistic Regression (baseline)
+- Random Forest (tuned)
+- Feature importance and partial dependence analysis
+This repository includes all code, processed data, and results necessary for reproducibility.
 
 # 2.0 Data
 Source: Chicago Police Department (public hate crime dataset)
@@ -14,77 +17,82 @@ Outcome Variable: violent_crime (binary)
     1 = Physical violence (assault, battery, robbery, arson, homicide)
     0 = Non-violent offense (e.g., vandalism, harassment)
 Violence is operationalized as direct physical harm, consistent with established criminological definitions.
-Predictor Variables
-Bias Type (e.g., anti-Black, anti-Jewish, anti-Gay, etc.)
-Police Reporting Area (North, Central, South)
-Disposition
-    Bona fide
-    Undetermined
-    Unfounded
-Season of occurrence (derived from date)
-Categorical predictors were one-hot encoded using pandas.get_dummies().
+
+Predictor Variables:
+- Motivations: Bias type (e.g., ANTI-JEWISH, ANTI-GAY)
+- CPD.Area: Police reporting area (North, Central, South)
+- DISPOSITION: Determination of bias (Bona fide, Undetermined, Unfounded)
+- DATEOCC: Date of occurrence (aggregated to season)
 
 # 3.0 Methodology
-3.1 Data Preprocessing
-Converted date field to datetime format
-Derived seasonal feature from incident month
-Encoded categorical variables via one-hot encoding
-Split dataset into training (75%) and testing (25%) sets
-Random seed fixed for reproducibility
+Data Cleaning & Feature Engineering
+- Converted DATEOCC to a season variable (Winter, Spring, Summer, Fall)
+- Encoded categorical variables with pd.get_dummies
 
-3.2 Models
-Logistic Regression (Baseline Model)
-Purpose: Establish linear baseline performance
-Evaluation metric: ROC-AUC
-Random Forest Classifier
-Ensemble of decision trees
-Non-linear, non-parametric model
-Few distributional assumptions
-Hyperparameters tuned using GridSearchCV:
-    n_estimators: 100–500
-    max_features: 2–8
-    min_samples_leaf: 2–6
-    5-fold cross-validation
-    Scoring metric: ROC-AUC
+Modeling
+- Split data: 75% train / 25% test
+- Baseline model: Logistic Regression (balanced classes)
+- Tuned model: Random Forest with hyperparameter search for:
+        n_estimators = 100, 200, 300
+        max_features = 4, 6, 8
+        min_samples_leaf = 1, 2, 4
+
+Evaluation Metrics
+- Accuracy
+- ROC-AUC
+- Confusion matrices
+- Feature importance & partial dependence plots
 
 # 4.0 Model Evaluation
-Evaluation metrics: ROC-AUC, Accuracy, Feature importance, Partial dependence analysis
-Performance Summary
+Model Performance Summary:
 
-| Model                 | Accuracy | ROC-AUC |
-| --------------------- | -------- | ------- |
-| Untuned Random Forest | 0.661    | 0.717   |
-| Tuned Random Forest   | 0.678    | 0.749   |
+| Model               | Accuracy | ROC-AUC |
+| ------------------- | -------- | ------- |
+| Logistic Regression | 0.668    | 0.749   |
+| Tuned Random Forest | 0.676    | 0.740   |
 
-# 5.0 Key Findings
-5.1 Feature Importance
-The most influential predictors included:
-    Anti-Jewish bias
-    Anti-Gay bias
-    Seasonal indicators
-    Disposition category
-Notably:
-Anti-Jewish bias decreased predicted probability of violence.
-Anti-Gay and other anti-Queer biases increased predicted probability.
-Spring and Summer slightly increased predicted probability relative to Fall/Winter.
-Bona fide designation increased predicted probability of violence relative to undetermined cases.
+- Logistic Regression slightly outperforms Random Forest in ROC-AUC.
+- Both models demonstrate moderate predictive performance for violent hate crimes.
 
-5.2 Spatial Observations (Exploratory)
+Random Forest Feature Importance:
+| Rank | Feature                                 | Importance |
+| ---- | --------------------------------------- | ---------- |
+| 1    | Motivations_ANTI-JEWISH                 | 0.297      |
+| 2    | Motivations_ANTI-GAY (MALE)             | 0.127      |
+| 3    | Motivations_ANTI-ASIAN                  | 0.057      |
+| 4    | Motivations_ANTI-HISPANIC/LATINO        | 0.048      |
+| 5    | CPD.Area_South                          | 0.041      |
+| 6    | CPD.Area_North                          | 0.039      |
+| 7    | Motivations_ANTI-WHITE                  | 0.037      |
+| 8    | Motivations_ANTI-TRANSGENDER            | 0.037      |
+| 9    | Motivations_ANTI-MULTIPLE RACES/GROUP   | 0.036      |
+| 10   | Motivations_ANTI-BLACK/AFRICAN-AMERICAN | 0.034      |
+
+Partial Dependencies:
+| Feature                          | Effect on `violent_crime=1` |
+| -------------------------------- | --------------------------- |
+| Motivations_ANTI-JEWISH          | decreases likelihood        |
+| Motivations_ANTI-GAY (MALE)      | increases likelihood        |
+| Motivations_ANTI-ASIAN           | increases likelihood        |
+| Motivations_ANTI-HISPANIC/LATINO | increases likelihood        |
+| CPD.Area_South                   | increases likelihood        |
+
+- Anti-Jewish bias reduces the probability of violence.
+- Anti-Gay, Anti-Asian, and Anti-Hispanic biases increase the likelihood.
+- Violent incidents are more likely in the Southern CPD reporting area.
+
+Other Findings:
+- Other anti-Queer biases increased predicted probability.
+- Violent incidents are less likely in the Northern CPD reporting area.
+- Spring and Summer slightly increased predicted probability relative to Fall/Winter.
+
 Separate exploratory spatial analysis (not included in model training) revealed:
-    Northern Chicago exhibited higher overall hate crime counts.
-    Southern Chicago exhibited a higher proportion of violent incidents.
+- Northern Chicago exhibited higher overall hate crime counts.
+- Southern Chicago exhibited a higher proportion of violent incidents.
 These findings suggest potential geographic reporting or contextual differences, though spatial covariates were not included in the classifier.
 
-# 6.0 Limitations
-Several constraints affect interpretation:
-No demographic or socioeconomic covariates included in classification model.
-Potential reporting bias across neighborhoods.
-No class imbalance correction applied.
-No temporal cross-validation.
-Single-city case study limits generalizability.
-
-Future extensions could incorporate:
-Ward-level demographic integration
-Class imbalance handling (e.g., SMOTE or class weights)
-Out-of-time validation
-Multi-city comparative modeling
+# 6.0 Limitations & Next Steps
+Geography: Analysis is restricted to Chicago, results may differ in other cities.
+Demographics: Socioeconomic and population features were not included. Incorporating ward-level demographics could improve predictive power.
+Bias Reporting: Variability in reporting may affect model accuracy, particularly in affluent vs. marginalized areas.
+Future Work: Expand analysis to other cities, incorporate covariates, and explore temporal trends more deeply.
