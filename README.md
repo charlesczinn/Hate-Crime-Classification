@@ -16,21 +16,21 @@ Source: Chicago Police Department (public hate crime dataset for 2012–2025)
 
 Unit of Analysis: Individual incident
 
-Outcome Variable: violent_crime (binary)
+Outcome Variable: `violent_crime` (binary)
 - 1 = Physical violence (assault, battery, robbery, arson, homicide)
 - 0 = Non-violent offense (e.g., vandalism, harassment)
 
 Violence is operationalized as direct physical harm, consistent with established criminological definitions.
 
 Predictor Variables:
-- Motivations: Bias type (e.g., ANTI-JEWISH, ANTI-GAY)
-- CPD.Area: Police reporting area (North, Central, South)
-- DISPOSITION: Determination of bias (Bona fide, Undetermined, Unfounded)
-- DATEOCC: Date of occurrence (aggregated to season)
+- `Motivations`: Bias type (e.g., ANTI-JEWISH, ANTI-GAY)
+- `CPD.Area`: Police reporting area (North, Central, South)
+- `DISPOSITION`: Determination of bias (Bona fide, Undetermined, Unfounded)
+- `DATEOCC`: Date of occurrence (aggregated to season)
 
 # 3.0 Methodology
 Data Cleaning & Feature Engineering
-- Converted DATEOCC to a season variable (Winter, Spring, Summer, Fall)
+- Converted `DATEOCC` to a `season` variable (Winter, Spring, Summer, Fall)
 - Encoded categorical variables with pd.get_dummies
 
 Modeling
@@ -88,7 +88,7 @@ Partial Dependencies:
 Other Findings:
 - Other anti-Queer biases increased predicted probability.
 - Violent incidents are less likely in the Northern CPD reporting area.
-- Spring and Summer slightly increased predicted probability relative to Fall/Winter.
+- Summer slightly increased predicted probability relative to Winter.
 
 Separate exploratory spatial analysis (not included in model training) revealed:
 - Northern Chicago exhibited higher overall hate crime counts.
