@@ -1,101 +1,67 @@
-# Violent Hate Crime Classification Using Machine Learning
-This repository contains the data, notebooks, and requirements for analyzing hate crimes in Chicago from 2012 to 2025.
+# Predicting Violent Hate Crimes in Chicago
+Logistic Regression and Random Forest Comparison
 
-This project is built with Python 3.13.5. To ensure reproducibility, a `requirements.txt` file is provided.
+## 1. Overview
+This project analyzes Chicago Police Department hate crime records (2012–2025) to predict whether a hate crime involves physical violence and to identify which incident characteristics are most associated with violence.
 
-# 1.0 Overview
-This project analyzes hate crimes in Chicago from 2012–2025 to identify factors associated with violent hate crimes. Using Chicago Police Department open data, the goal is to predict whether a hate crime is violent and to interpret which features drive violence.
-The project implements:
-- Logistic Regression (baseline)
-- Random Forest (tuned)
-- Feature importance and partial dependence analysis
+The notebook (`Hate_Crime_Classification.ipynb`) covers:
+- Data cleaning and exploratory analysis
+- A logistic regression baseline and a tuned random forest, evaluated with 5-fold cross-validation and a held-out test set
+- A leakage check on a post-investigation variable
+- Model interpretation with permutation importance and partial dependence
 
-# 2.0 Data
-Source: Chicago Police Department (public hate crime dataset for 2012–2025)
+All code, data, and outputs needed to reproduce the analysis are included.
 
-Unit of Analysis: Individual incident
+## 2. Data
+- **Source:** Chicago Police Department hate crime open data (`data/crimes.csv`)
+- **Coverage:** 2012–2025; unit of analysis is the individual incident
+- **Outcome:** `violent_crime` (1 = physical violence: assault, battery, robbery, arson, homicide; 0 = non-violent offenses such as vandalism or harassment)
+- **Predictors** (available at the time of report):
+  - `Motivations`: bias type (e.g., ANTI-JEWISH, ANTI-GAY (MALE))
+  - `CPD.Area`: police reporting area (North, Central, South)
+  - `season`: derived from the date of occurrence
 
-Outcome Variable: `violent_crime` (binary)
-- 1 = Physical violence (assault, battery, robbery, arson, homicide)
-- 0 = Non-violent offense (e.g., vandalism, harassment)
+## 3. Methods
+**Cleaning.** Stripped whitespace from bias categories and removed 5 records marked `DUPLICATE` or `PENDING INVESTIGATION`, leaving 1,599 incidents (52.9% violent).
 
-Violence is operationalized as direct physical harm, consistent with established criminological definitions.
+**Modeling.** Stratified 75/25 train/test split. Logistic regression (balanced class weights) as a baseline; random forest (balanced class weights) tuned by grid search over `n_estimators`, `max_features`, and `min_samples_leaf` using 5-fold cross-validated ROC-AUC.
 
-Predictor Variables:
-- `Motivations`: Bias type (e.g., ANTI-JEWISH, ANTI-GAY)
-- `CPD.Area`: Police reporting area (North, Central, South)
-- `DISPOSITION`: Determination of bias (Bona fide, Undetermined, Unfounded)
-- `DATEOCC`: Date of occurrence (aggregated to season)
+**Leakage check.** `DISPOSITION` (bona fide, undetermined, unfounded) is determined after investigation, so it is excluded from the main models and tested separately.
 
-# 3.0 Methodology
-Feature Engineering
-- Converted `DATEOCC` to a `season` variable (Winter, Spring, Summer, Fall)
-- Encoded categorical variables with pd.get_dummies
+**Interpretation.** Permutation importance on the test set (drop in ROC-AUC) and partial dependence plots for the top features.
 
-Modeling
-- Split data: 75% train / 25% test
-- Baseline model: Logistic Regression (balanced classes)
-- Tuned model: Random Forest with hyperparameter search for:
-        n_estimators = 100, 200, 300
-        max_features = 4, 6, 8
-        min_samples_leaf = 1, 2, 4
+## 4. Results
 
-Evaluation Metrics
-- Accuracy
-- ROC-AUC
-- Confusion matrices
-- Feature importance & partial dependence plots
+| Model | CV ROC-AUC | Test ROC-AUC | Accuracy | Recall (violent) | Precision (violent) |
+| --- | --- | --- | --- | --- | --- |
+| Logistic regression | 0.772 | 0.760 | 0.695 | 0.670 | 0.732 |
+| Random forest (tuned) | 0.759 | 0.740 | 0.680 | 0.679 | 0.706 |
 
-# 4.0 Model Evaluation & Results
-Model Performance Summary:
+- Logistic regression performs as well as or slightly better than the random forest, suggesting largely additive relationships; the simpler model is sufficient.
+- Adding `DISPOSITION` changes test ROC-AUC by less than 0.01, so results are not driven by post-investigation information.
 
-| Model               | Accuracy | ROC-AUC |
-| ------------------- | -------- | ------- |
-| Logistic Regression | 0.688    | 0.759   |
-| Tuned Random Forest | 0.688    | 0.749   |
+**Most important features (permutation importance, random forest):**
 
-- Logistic Regression slightly outperforms Random Forest in ROC-AUC.
-- Both models demonstrate moderate predictive performance for violent hate crimes.
+| Rank | Feature | Mean drop in ROC-AUC |
+| --- | --- | --- |
+| 1 | Motivations_ANTI-JEWISH | 0.071 |
+| 2 | Motivations_ANTI-GAY (MALE) | 0.046 |
+| 3 | Motivations_ANTI-TRANSGENDER | 0.011 |
+| 4 | Motivations_ANTI-BLACK/AFRICAN-AMERICAN | 0.008 |
+| 5 | Motivations_ANTI-WHITE | 0.007 |
 
-Random Forest Feature Importance:
-| Rank | Feature                                 | Importance |
-| ---- | --------------------------------------- | ---------- |
-| 1    | Motivations_ANTI-JEWISH                 | 0.297      |
-| 2    | Motivations_ANTI-GAY (MALE)             | 0.127      |
-| 3    | Motivations_ANTI-ASIAN                  | 0.057      |
-| 4    | Motivations_ANTI-HISPANIC/LATINO        | 0.048      |
-| 5    | CPD.Area_South                          | 0.041      |
-| 6    | CPD.Area_North                          | 0.039      |
-| 7    | Motivations_ANTI-WHITE                  | 0.037      |
-| 8    | Motivations_ANTI-TRANSGENDER            | 0.037      |
-| 9    | Motivations_ANTI-MULTIPLE RACES/GROUP   | 0.036      |
-| 10   | Motivations_ANTI-BLACK/AFRICAN-AMERICAN | 0.034      |
+**Direction of effects:**
+- Anti-Jewish incidents are far less likely to be violent (16% vs. 61% of other incidents), consistent with a high share of property offenses.
+- Anti-gay (male) (78% violent), anti-transgender (86%, n = 51), and anti-white (76%) incidents are more likely to involve physical violence.
+- Incidents in the South reporting area are more often violent (75%) than in the North (47%), though the South has few incidents (177) and adds little predictive value once motivation is known.
 
-Partial Dependencies:
-| Feature                          | Effect on `violent_crime=1` |
-| -------------------------------- | --------------------------- |
-| Motivations_ANTI-JEWISH          | decreases likelihood        |
-| Motivations_ANTI-GAY (MALE)      | increases likelihood        |
-| Motivations_ANTI-ASIAN           | increases likelihood        |
-| Motivations_ANTI-HISPANIC/LATINO | increases likelihood        |
-| CPD.Area_South                   | increases likelihood        |
+Figures are saved in `outputs/`: exploratory summaries, ROC curves and confusion matrices, permutation importance, and partial dependence.
 
-- Anti-Jewish bias reduces the probability of violence.
-- Anti-Gay, Anti-Asian, and Anti-Hispanic biases increase the likelihood.
-- Violent incidents are more likely in the Southern CPD reporting area.
+## 5. Limitations and Next Steps
+- **Moderate predictive power:** report-time features cannot capture the circumstances that drive violence; results describe associations, not causes.
+- **Reporting differences:** hate crime reporting varies across neighborhoods and communities.
+- **Geography:** results apply to Chicago and may not generalize.
+- **Next steps:** add ward- or community-level demographic covariates, model temporal trends, and compare with other cities.
 
-Other Findings:
-- Other anti-Queer biases increased predicted probability.
-- Violent incidents are less likely in the Northern CPD reporting area.
-- Summer slightly increased predicted probability relative to Winter.
-
-Separate exploratory spatial analysis (not included in model training) revealed:
-- Northern Chicago exhibited higher overall hate crime counts.
-- Southern Chicago exhibited a higher proportion of violent incidents.
-These findings suggest potential geographic reporting or contextual differences, though spatial covariates were not included in the classifier.
-
-# 5.0 Limitations & Next Steps
-- Geography: Analysis is restricted to Chicago, results may differ in other cities.
-- Demographics: Socioeconomic and population features were not included. Incorporating ward-level demographics could improve predictive power.
-- Bias Reporting: Variability in reporting may affect model accuracy, particularly in affluent vs. marginalized areas.
-- Future Work: Expand analysis to other cities, incorporate covariates, and explore temporal trends more deeply.
+## 6. Reproducing
+Requires Python 3 with pandas, numpy, scikit-learn, matplotlib, and seaborn. Run `Hate_Crime_Classification.ipynb` from the repository root; figures are written to `outputs/`.
